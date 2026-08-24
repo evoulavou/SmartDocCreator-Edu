@@ -26,7 +26,32 @@ def read_tags_from_docx(file_path):
     except Exception as e:
         print(f"  Error reading '{os.path.basename(file_path)}': {e}")
         return []
+        
+def prepare_pdfs_for_signing(input_folder, output_folder):
+    """
+    Αντιγράφει όλα τα ανυπόγραφα PDF σε έναν καθαρό φάκελο
+    για μαζική ψηφιακή υπογραφή.
+    """
+    os.makedirs(output_folder, exist_ok=True)
 
+    copied = 0
+
+    for filename in os.listdir(input_folder):
+        if not filename.lower().endswith(".pdf"):
+            continue
+
+        # Δεν θέλουμε τυχόν ήδη υπογεγραμμένα αρχεία
+        if filename.lower().endswith("_signed.pdf"):
+            continue
+
+        source = os.path.join(input_folder, filename)
+        destination = os.path.join(output_folder, filename)
+
+        shutil.copy2(source, destination)
+        copied += 1
+
+    print(f"Έτοιμα για υπογραφή: {copied} PDF")
+    print(f"Φάκελος: {output_folder}")
 
 def organize_files_by_school(input_folder, output_folder):
     if not os.path.exists(input_folder):
