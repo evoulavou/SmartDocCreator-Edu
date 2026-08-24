@@ -17,4 +17,4 @@ filename = filedialog.askopenfilename(
 print(filename)
 placements(filename)
 notifications3(filename)
-organize_files_by_school('notifications/', 'my_school_pdfs/')
+prepare_pdfs_for_signing('notifications/', 'to_sign/')
