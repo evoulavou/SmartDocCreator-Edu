@@ -53,6 +53,82 @@ def prepare_pdfs_for_signing(input_folder, output_folder):
     print(f"Έτοιμα για υπογραφή: {copied} PDF")
     print(f"Φάκελος: {output_folder}")
 
+def organize_signed_pdfs_by_school(metadata_folder, signed_folder, output_folder):
+    """
+    Ταξινομεί τα υπογεγραμμένα *_signed.pdf ανά σχολείο,
+    χρησιμοποιώντας τις ετικέτες του αντίστοιχου αρχικού .docx.
+    """
+
+    os.makedirs(output_folder, exist_ok=True)
+
+    total_signed = 0
+    matched = 0
+    unmatched = []
+
+    for filename in os.listdir(signed_folder):
+
+        # Μας ενδιαφέρουν μόνο τα υπογεγραμμένα PDF
+        if not filename.lower().endswith("_signed.pdf"):
+            continue
+
+        total_signed += 1
+
+        signed_pdf = os.path.join(signed_folder, filename)
+
+        # Αφαιρούμε το _signed.pdf
+        # π.χ. test_signed.pdf -> test
+        base_name = filename[:-len("_signed.pdf")]
+
+        # Βρίσκουμε το αντίστοιχο αρχικό Word
+        docx_path = os.path.join(
+            metadata_folder,
+            base_name + ".docx"
+        )
+
+        if not os.path.exists(docx_path):
+            print(f"ΧΩΡΙΣ ΑΝΤΙΣΤΟΙΧΙΣΗ: {filename}")
+            unmatched.append(filename)
+            continue
+
+        # Διαβάζουμε τα σχολεία από τις ετικέτες του Word
+        schools = read_tags_from_docx(docx_path)
+
+        if not schools:
+            print(f"ΧΩΡΙΣ ΣΧΟΛΕΙΟ: {filename}")
+            unmatched.append(filename)
+            continue
+
+        matched += 1
+
+        # Το ίδιο κοινοποιητήριο μπορεί να αφορά περισσότερα σχολεία
+        for school in schools:
+
+            school_folder = os.path.join(
+                output_folder,
+                sanitize_foldername(school)
+            )
+
+            os.makedirs(school_folder, exist_ok=True)
+
+            destination = os.path.join(
+                school_folder,
+                filename
+            )
+
+            shutil.copy2(signed_pdf, destination)
+
+    print()
+    print("===== ΑΠΟΤΕΛΕΣΜΑ ΤΑΞΙΝΟΜΗΣΗΣ =====")
+    print(f"Υπογεγραμμένα PDF: {total_signed}")
+    print(f"Αντιστοιχίστηκαν: {matched}")
+    print(f"Χωρίς αντιστοίχιση: {len(unmatched)}")
+
+    if unmatched:
+        print()
+        print("Αρχεία που χρειάζονται έλεγχο:")
+        for filename in unmatched:
+            print(f" - {filename}")
+
 def organize_files_by_school(input_folder, output_folder):
     if not os.path.exists(input_folder):
         print(f"Error: The folder '{input_folder}' does not exist.")
