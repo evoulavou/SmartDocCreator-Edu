@@ -76,14 +76,15 @@ def organize_signed_pdfs_by_school(metadata_folder, signed_folder, output_folder
         signed_pdf = os.path.join(signed_folder, filename)
 
         # Αφαιρούμε το _signed.pdf
-        # π.χ. test_signed.pdf -> test
-        base_name = filename[:-len("_signed.pdf")]
+        name_without_signed = filename[:-len("_signed.pdf")]
+
+        # Αφαιρούμε και το τελευταίο τμήμα χαρακτήρων
+        # που προσθέτει το πρόγραμμα ψηφιακής υπογραφής
+        base_name = name_without_signed.rsplit("_", 1)[0]
 
         # Βρίσκουμε το αντίστοιχο αρχικό Word
-        docx_path = os.path.join(
-            metadata_folder,
-            base_name + ".docx"
-        )
+        docx_filename = base_name + ".docx"
+        docx_path = os.path.join(metadata_folder, docx_filename)
 
         if not os.path.exists(docx_path):
             print(f"ΧΩΡΙΣ ΑΝΤΙΣΤΟΙΧΙΣΗ: {filename}")
