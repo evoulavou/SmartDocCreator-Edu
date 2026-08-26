@@ -82,40 +82,43 @@ def organize_signed_pdfs_by_school(metadata_folder, signed_folder, output_folder
         # που προσθέτει το πρόγραμμα ψηφιακής υπογραφής
         base_name = name_without_signed.rsplit("_", 1)[0]
 
-        # Βρίσκουμε το αντίστοιχο αρχικό Word.
-# Το πρόγραμμα ψηφιακής υπογραφής μετατρέπει τις τελείες
-# του αρχικού ονόματος σε κάτω παύλες.
+               # Βρίσκουμε το αντίστοιχο αρχικό Word.
+        # Το πρόγραμμα ψηφιακής υπογραφής μετατρέπει τις τελείες
+        # του αρχικού ονόματος σε κάτω παύλες.
 
-docx_path = None
+        docx_path = None
 
-normalized_base_name = base_name.replace(".", "_")
+        normalized_base_name = base_name.replace(".", "_")
 
-for original_filename in os.listdir(metadata_folder):
+        for original_filename in os.listdir(metadata_folder):
 
-    if not original_filename.lower().endswith(".docx"):
-        continue
+            if not original_filename.lower().endswith(".docx"):
+                continue
 
-    original_base_name = os.path.splitext(original_filename)[0]
-    normalized_original = original_base_name.replace(".", "_")
+            original_base_name = os.path.splitext(original_filename)[0]
+            normalized_original = original_base_name.replace(".", "_")
 
-    if normalized_original == normalized_base_name:
-        docx_path = os.path.join(metadata_folder, original_filename)
-        break
+            if normalized_original == normalized_base_name:
+                docx_path = os.path.join(
+                    metadata_folder,
+                    original_filename
+                )
+                break
 
-if docx_path is None:
-    print(f"ΧΩΡΙΣ ΑΝΤΙΣΤΟΙΧΙΣΗ: {filename}")
-    unmatched.append(filename)
-    continue
+        if docx_path is None:
+            print(f"ΧΩΡΙΣ ΑΝΤΙΣΤΟΙΧΙΣΗ: {filename}")
+            unmatched.append(filename)
+            continue
 
         # Διαβάζουμε τα σχολεία από τις ετικέτες του Word
-schools = read_tags_from_docx(docx_path)
+        schools = read_tags_from_docx(docx_path)
 
-if not schools:
-    print(f"ΧΩΡΙΣ ΣΧΟΛΕΙΟ: {filename}")
-    unmatched.append(filename)
-    continue
+        if not schools:
+            print(f"ΧΩΡΙΣ ΣΧΟΛΕΙΟ: {filename}")
+            unmatched.append(filename)
+            continue
 
-matched += 1
+        matched += 1
 
         # Το ίδιο κοινοποιητήριο μπορεί να αφορά περισσότερα σχολεία
         for school in schools:
@@ -125,15 +128,20 @@ matched += 1
                 sanitize_foldername(school)
             )
 
-            os.makedirs(school_folder, exist_ok=True)
+            os.makedirs(
+                school_folder,
+                exist_ok=True
+            )
 
             destination = os.path.join(
                 school_folder,
                 filename
             )
 
-            shutil.copy2(signed_pdf, destination)
-
+            shutil.copy2(
+                signed_pdf,
+                destination
+            )
     print()
     print("===== ΑΠΟΤΕΛΕΣΜΑ ΤΑΞΙΝΟΜΗΣΗΣ =====")
     print(f"Υπογεγραμμένα PDF: {total_signed}")
