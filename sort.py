@@ -108,14 +108,14 @@ if docx_path is None:
     continue
 
         # Διαβάζουμε τα σχολεία από τις ετικέτες του Word
-        schools = read_tags_from_docx(docx_path)
+schools = read_tags_from_docx(docx_path)
 
-        if not schools:
-            print(f"ΧΩΡΙΣ ΣΧΟΛΕΙΟ: {filename}")
-            unmatched.append(filename)
-            continue
+if not schools:
+    print(f"ΧΩΡΙΣ ΣΧΟΛΕΙΟ: {filename}")
+    unmatched.append(filename)
+    continue
 
-        matched += 1
+matched += 1
 
         # Το ίδιο κοινοποιητήριο μπορεί να αφορά περισσότερα σχολεία
         for school in schools:
