@@ -1,33 +1,60 @@
 import os
 
-folder = "to_sign"
+signed_folder = "to_sign"
+metadata_folder = "notifications"
 
-print("=== ΠΡΑΓΜΑΤΙΚΑ FILENAMES ΑΠΟ ΤΑ WINDOWS ===")
+print("=== ΕΛΕΓΧΟΣ ΑΝΤΙΣΤΟΙΧΙΣΗΣ ===")
 print()
 
-for filename in os.listdir(folder):
+for filename in os.listdir(signed_folder):
 
-    if "_signed" not in filename.lower():
+    if not filename.lower().endswith("_signed.pdf"):
         continue
 
-    print("ΟΝΟΜΑ:")
-    print(filename)
-
-    print("\nREPR:")
+    print("SIGNED:")
     print(repr(filename))
 
-    print("\nΜΗΚΟΣ:")
-    print(len(filename))
+    # Αυτό ακριβώς κάνει τώρα το sort.py
+    name_without_signed = filename[:-len("_signed.pdf")]
+    base_name = name_without_signed.rsplit("_", 1)[0]
 
-    print("\nΤΕΛΕΥΤΑΙΟΙ 30 ΧΑΡΑΚΤΗΡΕΣ:")
-    print(repr(filename[-30:]))
+    expected_docx = base_name + ".docx"
 
-    print("\nUNICODE:")
-    for i, char in enumerate(filename):
-        print(
-            i,
-            repr(char),
-            f"U+{ord(char):04X}"
-        )
+    print()
+    print("ΨΑΧΝΕΙ DOCX:")
+    print(repr(expected_docx))
 
-    print("\n" + "=" * 70 + "\n")
+    docx_path = os.path.join(
+        metadata_folder,
+        expected_docx
+    )
+
+    print()
+    print("ΥΠΑΡΧΕΙ;", os.path.exists(docx_path))
+
+    # Βρες DOCX που περιέχει τον ίδιο ΑΜ
+    parts = base_name.split("_")
+
+    numbers = [
+        x for x in parts
+        if x.isdigit()
+    ]
+
+    if numbers:
+
+        am = numbers[-1]
+
+        print()
+        print("DOCX ΜΕ ΙΔΙΟ ΑΜ:")
+
+        for docx in os.listdir(metadata_folder):
+
+            if (
+                docx.lower().endswith(".docx")
+                and am in docx
+            ):
+                print(repr(docx))
+
+    print()
+    print("=" * 70)
+    print()
