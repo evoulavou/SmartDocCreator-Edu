@@ -1,60 +1,81 @@
 import os
+import unicodedata
 
 signed_folder = "to_sign"
 metadata_folder = "notifications"
-
-print("=== ΕΛΕΓΧΟΣ ΑΝΤΙΣΤΟΙΧΙΣΗΣ ===")
-print()
 
 for filename in os.listdir(signed_folder):
 
     if not filename.lower().endswith("_signed.pdf"):
         continue
 
-    print("SIGNED:")
-    print(repr(filename))
-
-    # Αυτό ακριβώς κάνει τώρα το sort.py
     name_without_signed = filename[:-len("_signed.pdf")]
     base_name = name_without_signed.rsplit("_", 1)[0]
-
     expected_docx = base_name + ".docx"
 
-    print()
-    print("ΨΑΧΝΕΙ DOCX:")
-    print(repr(expected_docx))
-
-    docx_path = os.path.join(
-        metadata_folder,
-        expected_docx
-    )
-
-    print()
-    print("ΥΠΑΡΧΕΙ;", os.path.exists(docx_path))
-
-    # Βρες DOCX που περιέχει τον ίδιο ΑΜ
+    # βρίσκουμε ΑΜ
     parts = base_name.split("_")
+    numbers = [x for x in parts if x.isdigit()]
 
-    numbers = [
-        x for x in parts
-        if x.isdigit()
-    ]
+    if not numbers:
+        continue
 
-    if numbers:
+    am = numbers[-1]
 
-        am = numbers[-1]
+    for actual_docx in os.listdir(metadata_folder):
 
-        print()
-        print("DOCX ΜΕ ΙΔΙΟ ΑΜ:")
+        if not actual_docx.lower().endswith(".docx"):
+            continue
 
-        for docx in os.listdir(metadata_folder):
+        if am not in actual_docx:
+            continue
 
-            if (
-                docx.lower().endswith(".docx")
-                and am in docx
-            ):
-                print(repr(docx))
+        print("EXPECTED:")
+        print(repr(expected_docx))
 
-    print()
-    print("=" * 70)
-    print()
+        print("\nACTUAL:")
+        print(repr(actual_docx))
+
+        print("\nΙΣΑ ΚΑΝΟΝΙΚΑ;")
+        print(expected_docx == actual_docx)
+
+        print("\nΙΣΑ ΜΕ NFC NORMALIZATION;")
+        print(
+            unicodedata.normalize("NFC", expected_docx)
+            ==
+            unicodedata.normalize("NFC", actual_docx)
+        )
+
+        print("\nΔΙΑΦΟΡΕΣ ΧΑΡΑΚΤΗΡΩΝ:")
+
+        e = expected_docx
+        a = actual_docx
+
+        for i in range(max(len(e), len(a))):
+
+            c1 = e[i] if i < len(e) else "<END>"
+            c2 = a[i] if i < len(a) else "<END>"
+
+            if c1 != c2:
+
+                if c1 != "<END>":
+                    info1 = (
+                        repr(c1),
+                        f"U+{ord(c1):04X}",
+                        unicodedata.name(c1, "UNKNOWN")
+                    )
+                else:
+                    info1 = ("<END>", "", "")
+
+                if c2 != "<END>":
+                    info2 = (
+                        repr(c2),
+                        f"U+{ord(c2):04X}",
+                        unicodedata.name(c2, "UNKNOWN")
+                    )
+                else:
+                    info2 = ("<END>", "", "")
+
+                print(i, info1, "!=", info2)
+
+        print("\n" + "=" * 70)
