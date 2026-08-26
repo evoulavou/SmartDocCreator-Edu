@@ -82,14 +82,30 @@ def organize_signed_pdfs_by_school(metadata_folder, signed_folder, output_folder
         # που προσθέτει το πρόγραμμα ψηφιακής υπογραφής
         base_name = name_without_signed.rsplit("_", 1)[0]
 
-        # Βρίσκουμε το αντίστοιχο αρχικό Word
-        docx_filename = base_name + ".docx"
-        docx_path = os.path.join(metadata_folder, docx_filename)
+        # Βρίσκουμε το αντίστοιχο αρχικό Word.
+# Το πρόγραμμα ψηφιακής υπογραφής μετατρέπει τις τελείες
+# του αρχικού ονόματος σε κάτω παύλες.
 
-        if not os.path.exists(docx_path):
-            print(f"ΧΩΡΙΣ ΑΝΤΙΣΤΟΙΧΙΣΗ: {filename}")
-            unmatched.append(filename)
-            continue
+docx_path = None
+
+normalized_base_name = base_name.replace(".", "_")
+
+for original_filename in os.listdir(metadata_folder):
+
+    if not original_filename.lower().endswith(".docx"):
+        continue
+
+    original_base_name = os.path.splitext(original_filename)[0]
+    normalized_original = original_base_name.replace(".", "_")
+
+    if normalized_original == normalized_base_name:
+        docx_path = os.path.join(metadata_folder, original_filename)
+        break
+
+if docx_path is None:
+    print(f"ΧΩΡΙΣ ΑΝΤΙΣΤΟΙΧΙΣΗ: {filename}")
+    unmatched.append(filename)
+    continue
 
         # Διαβάζουμε τα σχολεία από τις ετικέτες του Word
         schools = read_tags_from_docx(docx_path)
