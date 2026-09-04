@@ -422,30 +422,30 @@ def notifications3(filename: str) -> None:
     df = pd.read_excel(filename, sheet_name=None, header=None)
     general_info = load_general_info(df)
 
-hm_raw = general_info.get(
-    'Ημέρα παρουσίασης εκπαιδευτικών στις θέσεις τοποθέτησης',
-    ''
-)
+    hm_raw = general_info.get(
+        'Ημέρα παρουσίασης εκπαιδευτικών στις θέσεις τοποθέτησης',
+        ''
+    )
 
-# Προσθήκη μίας ημέρας
-greek_days = [
-    'Δευτέρα',
-    'Τρίτη',
-    'Τετάρτη',
-    'Πέμπτη',
-    'Παρασκευή',
-    'Σάββατο',
-    'Κυριακή'
-]
+    # Προσθήκη μίας ημέρας στην ημερομηνία παρουσίασης
+    greek_days = [
+        'Δευτέρα',
+        'Τρίτη',
+        'Τετάρτη',
+        'Πέμπτη',
+        'Παρασκευή',
+        'Σάββατο',
+        'Κυριακή'
+    ]
 
-try:
-    date_part = str(hm_raw).split()[-1]
-    date_obj = datetime.strptime(date_part, '%d-%m-%Y')
-    date_obj += timedelta(days=1)
+    try:
+        date_part = str(hm_raw).split()[-1]
+        date_obj = datetime.strptime(date_part, '%d-%m-%Y')
+        date_obj += timedelta(days=1)
+        hm = f"{greek_days[date_obj.weekday()]} {date_obj.strftime('%d-%m-%Y')}"
+    except (ValueError, IndexError):
+        hm = str(hm_raw)
 
-    hm = f"{greek_days[date_obj.weekday()]} {date_obj.strftime('%d-%m-%Y')}"
-except (ValueError, IndexError):
-    hm = str(hm_raw)
     sheet_texts = _build_sheet_texts(hm)
 
     valid_filters = {'Εισαγωγή', 'Τροποποίηση', 'Ανάκληση'}
