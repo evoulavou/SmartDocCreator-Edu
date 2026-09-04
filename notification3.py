@@ -292,7 +292,7 @@ def _replace_personal_info(doc: Document, row: pd.Series, key: str, am_val: str)
         el.text = el.text.replace('[Ειδικότητα]', str(row['ΕΙΔΙΚΟΤΗΤΑ']))
         el.text = el.text.replace('[Α.Μ.]', am_val)
 
-        wr = '-' if key == 's6_Τοποθέτηση_διάθεση νεοδιόρισ' else str(row.get('ΥΠΟΧΡΕΩΤΙΚΟ ΩΡΑΡΙΟ', '-'))
+        wr = str(row.get('ΥΠΟΧΡΕΩΤΙΚΟ ΩΡΑΡΙΟ', '-'))
         el.text = el.text.replace('[Υπ. Ωράριο]', wr)
 
         if '[Τωρινή Θέση]' in el.text:
