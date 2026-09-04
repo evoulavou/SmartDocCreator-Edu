@@ -420,7 +420,10 @@ def _replace_schools_paragraph(doc: Document, found_schools: list[str]) -> None:
 def notifications3(filename: str) -> None:
     df = pd.read_excel(filename, sheet_name=None, header=None)
     general_info = load_general_info(df)
-    hm = '01-09-2026'
+    hm = general_info.get(
+    'Ημέρα παρουσίασης εκπαιδευτικών στις θέσεις τοποθέτησης',
+    ''
+    )
     sheet_texts = _build_sheet_texts(hm)
 
     valid_filters = {'Εισαγωγή', 'Τροποποίηση', 'Ανάκληση'}
