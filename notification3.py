@@ -313,7 +313,10 @@ def _replace_personal_info(doc: Document, row: pd.Series, key: str, am_val: str)
             elif key in APOSP_THESIS:
                 el.text = el.text.replace('[Τωρινή Θέση]', f'Με Απόσπαση απο: {row["ΔΔΕ/ΔΠΕ ΟΡΓΑΝΙΚΗΣ ΘΕΣΗΣ"]}')
             elif key in NO_THESI:
-                el.text = el.text.replace('[Τωρινή Θέση]', 'Τωρινή θέση: -')
+                el.text = el.text.replace(
+                   '[Τωρινή Θέση]',
+                   f'Προσωρινή τοποθέτηση: {row["ΣΧΟΛΕΙΟ ΤΟΠΟΘΕΤΗΣΗΣ"]}'
+               )
             elif key in BOSS_THESIS:
                 el.text = el.text.replace('[Τωρινή Θέση]', f'Σχολείο θητείας: {row["ΣΧΟΛΕΙΟ ΑΣΚΗΣΗΣ ΘΗΤΕΙΑΣ ΣΤΕΛΕΧΟΥΣ"]}')
 
