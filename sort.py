@@ -138,10 +138,21 @@ def organize_signed_pdfs_by_school(metadata_folder, signed_folder, output_folder
                 filename
             )
 
-            shutil.copy2(
-                signed_pdf,
-                destination
-            )
+            try:
+                if not os.path.isfile(signed_pdf):
+                    print(f"ΔΕΝ ΒΡΕΘΗΚΕ ΤΟ PDF: {signed_pdf}")
+                    continue
+
+                os.makedirs(school_folder, exist_ok=True)
+
+                shutil.copy2(signed_pdf, destination)
+
+            except OSError as e:
+                print(f"\nΣΦΑΛΜΑ ΑΝΤΙΓΡΑΦΗΣ: {filename}")
+                print(f"Πηγή: {signed_pdf}")
+                print(f"Προορισμός: {destination}")
+                print(f"Λεπτομέρειες: {e}")
+                raise
     print()
     print("===== ΑΠΟΤΕΛΕΣΜΑ ΤΑΞΙΝΟΜΗΣΗΣ =====")
     print(f"Υπογεγραμμένα PDF: {total_signed}")
