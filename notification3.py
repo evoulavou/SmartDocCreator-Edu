@@ -439,7 +439,7 @@ def notifications3(filename: str) -> None:
         ''
     )
 
-    # Προσθήκη μίας ημέρας στην ημερομηνία παρουσίασης
+# Χρήση της ημερομηνίας παρουσίασης από το Excel, χωρίς προσθήκη ημέρας
     greek_days = [
         'Δευτέρα',
         'Τρίτη',
@@ -453,7 +453,6 @@ def notifications3(filename: str) -> None:
     try:
         date_part = str(hm_raw).split()[-1]
         date_obj = datetime.strptime(date_part, '%d-%m-%Y')
-        date_obj += timedelta(days=1)
         hm = f"{greek_days[date_obj.weekday()]} {date_obj.strftime('%d-%m-%Y')}"
     except (ValueError, IndexError):
         hm = str(hm_raw)
